@@ -27,21 +27,24 @@ class ConvRepresentation1d(eqx.Module):
     stride: int = 1
     lhs_dil: int = 1
     rhs_dil: int = 1
-    form: DimensionRepresentation1d = DimensionRepresentation1d()
     flip: bool = False
+    permute_input: bool = False
+    permute_kernel: bool = False
 
 class ConvRepresentation1dSimple(eqx.Module):
     pad: tuple[int, int] = (0, 0)
-    form: DimensionRepresentation1d = DimensionRepresentation1d()
     flip: bool = False
+    permute_input: bool = False
+    permute_kernel: bool = False
 
     def __init__(
         self,
         representation: ConvRepresentation1d,
     ):
         self.pad = representation.pad
-        self.form = representation.form
         self.flip = representation.flip
+        self.permute_input = representation.permute_input
+        self.permute_kernel = representation.permute_kernel
 
 
 def parse_dimension_representation(dimensions: ConvDimensionNumbers) -> DimensionRepresentation1d:
@@ -65,6 +68,11 @@ def parse_dimension_representation(dimensions: ConvDimensionNumbers) -> Dimensio
         rhs=tuple(rhs_dict[i] for i in dimensions.rhs_spec),
         out=tuple(out_dict[i] for i in dimensions.out_spec),
     )
+
+def parse_permuations(dimension_representation: DimensionRepresentation1d) -> tuple[bool, bool]:
+    permute_input = dimension_representation.lhs == ("C_i", "B", "N_i")
+    permute_kernel = dimension_representation.rhs == ("C_i", "C_o", "K")
+    return permute_input, permute_kernel
 
 def find_conv_start(splitted: list[str]):
     for i, line in enumerate(splitted):
@@ -120,13 +128,19 @@ def parse_conv_jaxpr(jaxpr: jax.core.Jaxpr) -> ConvRepresentation1d:
     args_mapped = extract_args(jaxpr_printed_splitted, conv_start)
     args_parsed = parse_args(args_mapped)
 
+    flip = uses_flip(jaxpr_printed_splitted)
+    dimension_representation = parse_dimension_representation(args_parsed["dimension_numbers"])
+    permute_input, permute_kernel = parse_permuations(dimension_representation)
+
+
     conv_representation = ConvRepresentation1d(
         pad=args_parsed["pad"],
         stride=args_parsed["stride"],
         lhs_dil=args_parsed["lhs_dilation"],
         rhs_dil=args_parsed["rhs_dilation"],
-        form=parse_dimension_representation(args_parsed["dimension_numbers"]),
-        flip=uses_flip(jaxpr_printed_splitted),
+        flip=flip,
+        permute_input=permute_input,
+        permute_kernel=permute_kernel,
     )
 
     return conv_representation

@@ -56,3 +56,30 @@ with cols[2]:
 
 st.markdown("---")
 st.markdown(f"Number of points $N={NUM_POINTS}$")
+
+with st.expander("Insights"):
+    st.markdown(
+"""
+# Simplified options
+
+Means:
+
+- No padding ("VALID")
+- no modifications of convolution (no striding and no dilations of input or
+  kernel)
+
+In this case, we have for the primal computation:
+
+$$ N_o = N_i - K + 1 $$
+
+Hence,
+
+$$ \Delta N = N_o - N_i = 1 - K $$
+
+The filter vJp has to compensate by adding $\Delta N$ per side in padding and
+flips the filter.
+
+The kernel vJp has to permute the original input $x$ (swap batch and in channel
+axis).
+"""
+    )
