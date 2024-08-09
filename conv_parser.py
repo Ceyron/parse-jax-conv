@@ -30,6 +30,20 @@ class ConvRepresentation1d(eqx.Module):
     form: DimensionRepresentation1d = DimensionRepresentation1d()
     flip: bool = False
 
+class ConvRepresentation1dSimple(eqx.Module):
+    pad: tuple[int, int] = (0, 0)
+    form: DimensionRepresentation1d = DimensionRepresentation1d()
+    flip: bool = False
+
+    def __init__(
+        self,
+        representation: ConvRepresentation1d,
+    ):
+        self.pad = representation.pad
+        self.form = representation.form
+        self.flip = representation.flip
+
+
 def parse_dimension_representation(dimensions: ConvDimensionNumbers) -> DimensionRepresentation1d:
     lhs_dict = {
         0: "B",
@@ -179,14 +193,29 @@ class ConvParser1d:
     def _get_kernel_vjp_fun_jaxpr(self):
         return jax.make_jaxpr(self._get_kernel_vjp_fun())(self._get_output_array())
     
-    def get_primal_representation(self) -> ConvRepresentation1d:
-        return parse_conv_jaxpr(self._get_conv_fun_jaxpr())
+    def get_primal_representation(self, simplified=False) -> ConvRepresentation1d:
+        primal_representation = parse_conv_jaxpr(self._get_conv_fun_jaxpr())
+
+        if simplified:
+            return ConvRepresentation1dSimple(primal_representation)
+        else:
+            return primal_representation
     
-    def get_input_vjp_representation(self) -> ConvRepresentation1d:
-        return parse_conv_jaxpr(self._get_input_vjp_fun_jaxpr())
+    def get_input_vjp_representation(self, simplified=False) -> ConvRepresentation1d:
+        input_vjp_representation = parse_conv_jaxpr(self._get_input_vjp_fun_jaxpr())
+
+        if simplified:
+            return ConvRepresentation1dSimple(input_vjp_representation)
+        else:
+            return input_vjp_representation
     
-    def get_kernel_vjp_representation(self) -> ConvRepresentation1d:
-        return parse_conv_jaxpr(self._get_kernel_vjp_fun_jaxpr())
+    def get_kernel_vjp_representation(self, simplified=False) -> ConvRepresentation1d:
+        kernel_vjp_representation = parse_conv_jaxpr(self._get_kernel_vjp_fun_jaxpr())
+
+        if simplified:
+            return ConvRepresentation1dSimple(kernel_vjp_representation)
+        else:
+            return kernel_vjp_representation
     
     def _get_delta_N(self, fun, input):
         input_N = input.shape[-1]
