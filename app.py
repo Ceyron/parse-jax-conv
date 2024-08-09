@@ -8,19 +8,19 @@ with st.sidebar:
     kernel_size = st.slider("Kernel size", 1, 5, 3)
     advanced_options = st.toggle("Advanced options")
     if advanced_options:
+        num_points = st.slider("Number of points", 80, 120, 100)
         left_padding = st.slider("Left padding", 0, 5, 0)
         right_padding = st.slider("Right padding", 0, 5, 0)
         stride = st.slider("Stride", 1, 4, 1)
         lhs_dilation = st.slider("lhs dilation", 1, 3, 1)
         rhs_dilation = st.slider("rhs dilation", 1, 3, 1)
     else:
+        num_points = 100
         left_padding = 0
         right_padding = 0
         stride = 1
         lhs_dilation = 1
         rhs_dilation = 1
-
-NUM_POINTS = 100
 
 parser = ConvParser1d(
     kernel_size=kernel_size,
@@ -28,7 +28,7 @@ parser = ConvParser1d(
     padding=(left_padding, right_padding),
     lhs_dilation=lhs_dilation,
     rhs_dilation=rhs_dilation,
-    array_size=NUM_POINTS,
+    array_size=num_points,
 )
 
 cols = st.columns(3)
@@ -55,7 +55,6 @@ with cols[2]:
     st.latex(f"\Delta N = {delta_N}")
 
 st.markdown("---")
-st.markdown(f"Number of points $N={NUM_POINTS}$")
 st.markdown("IMPORTANT: despite saying it is 'convolution', this is actually cross-correlation!")
 
 with st.expander("Insights"):
