@@ -8,7 +8,7 @@ with st.sidebar:
     kernel_size = st.slider("Kernel size", 1, 5, 3)
     advanced_options = st.toggle("Advanced options")
     if advanced_options:
-        num_points = st.slider("Number of points", 80, 120, 100)
+        num_points = st.slider("Number of points", 1, 120, 100)
         left_padding = st.slider("Left padding", 0, 5, 0)
         right_padding = st.slider("Right padding", 0, 5, 0)
         stride = st.slider("Stride", 1, 4, 1)
@@ -21,6 +21,21 @@ with st.sidebar:
         stride = 1
         lhs_dilation = 1
         rhs_dilation = 1
+    
+    st.markdown("---")
+    input_formula_results = (
+        num_points + left_padding
+        - stride * ((-kernel_size + num_points + left_padding + right_padding) // stride)
+        - 1
+    )
+    st.write(f"Input vjp right padding: {input_formula_results}")
+    filter_formula_results = (
+        kernel_size - num_points - left_padding
+        +
+        stride * ((-kernel_size + num_points + left_padding + right_padding) // stride)
+    )
+    st.write(f"Filter vjp right padding: {filter_formula_results}")
+
 
 parser = ConvParser1d(
     kernel_size=kernel_size,
