@@ -113,7 +113,7 @@ def extract_args(splitted: list[str], start: int) -> dict[str, str]:
 
 def parse_args(args: dict[str, str]) -> dict[str, any]:
     parsed = {
-        "pad": eval(args["padding"]),
+        "pad": eval(args["padding"])[0],
         "stride": eval(args["window_strides"])[0],
         "lhs_dilation": eval(args["lhs_dilation"])[0],
         "rhs_dilation": eval(args["rhs_dilation"])[0],
