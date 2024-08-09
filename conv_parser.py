@@ -152,36 +152,36 @@ class ConvParser1d:
             )
         return conv_fun
     
-    def get_conv_fun_input(self):
+    def _get_conv_fun_input(self):
         return lambda lhs: self.get_conv_fun()(lhs, self._get_kernel_array())
     
-    def get_conv_fun_kernel(self):
+    def _get_conv_fun_kernel(self):
         return lambda rhs: self.get_conv_fun()(self._get_input_array(), rhs)
     
-    def get_conv_fun_jaxpr(self):
+    def _get_conv_fun_jaxpr(self):
         return jax.make_jaxpr(self.get_conv_fun())(self._get_input_array(), self._get_kernel_array())
     
-    def get_input_vjp_fun(self):
-        return jax.vjp(self.get_conv_fun_input(), self._get_input_array())[1]
+    def _get_input_vjp_fun(self):
+        return jax.vjp(self._get_conv_fun_input(), self._get_input_array())[1]
     
-    def get_kernel_vjp_fun(self):
-        return jax.vjp(self.get_conv_fun_kernel(), self._get_kernel_array())[1]
+    def _get_kernel_vjp_fun(self):
+        return jax.vjp(self._get_conv_fun_kernel(), self._get_kernel_array())[1]
     
     def _get_output_array(self):
         out_shape = self.get_conv_fun()(self._get_input_array(), self._get_kernel_array()).shape
         return jax.random.normal(jax.random.PRNGKey(2), out_shape)
     
-    def get_input_vjp_fun_jaxpr(self):
-        return jax.make_jaxpr(self.get_input_vjp_fun())(self._get_output_array())
+    def _get_input_vjp_fun_jaxpr(self):
+        return jax.make_jaxpr(self._get_input_vjp_fun())(self._get_output_array())
     
-    def get_kernel_vjp_fun_jaxpr(self):
-        return jax.make_jaxpr(self.get_kernel_vjp_fun())(self._get_output_array())
+    def _get_kernel_vjp_fun_jaxpr(self):
+        return jax.make_jaxpr(self._get_kernel_vjp_fun())(self._get_output_array())
     
     def get_primal_representation(self) -> ConvRepresentation1d:
-        return parse_conv_jaxpr(self.get_conv_fun_jaxpr())
+        return parse_conv_jaxpr(self._get_conv_fun_jaxpr())
     
     def get_input_vjp_representation(self) -> ConvRepresentation1d:
-        return parse_conv_jaxpr(self.get_input_vjp_fun_jaxpr())
+        return parse_conv_jaxpr(self._get_input_vjp_fun_jaxpr())
     
     def get_kernel_vjp_representation(self) -> ConvRepresentation1d:
-        return parse_conv_jaxpr(self.get_kernel_vjp_fun_jaxpr())
+        return parse_conv_jaxpr(self._get_kernel_vjp_fun_jaxpr())
