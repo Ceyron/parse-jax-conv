@@ -12,8 +12,8 @@ with st.sidebar:
         left_padding = st.slider("Left padding", 0, 5, 0)
         right_padding = st.slider("Right padding", 0, 5, 0)
         stride = st.slider("Stride", 1, 4, 1)
-        lhs_dilation = st.slider("lhs dilation", 1, 3, 1)
-        rhs_dilation = st.slider("rhs dilation", 1, 3, 1)
+        lhs_dilation = st.slider("lhs dilation (=Fill=Transposed Conv)", 1, 3, 1)
+        rhs_dilation = st.slider("rhs dilation (=Dilated/Atrous Convolution)", 1, 3, 1)
     else:
         num_points = 100
         left_padding = 0
