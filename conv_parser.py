@@ -27,13 +27,13 @@ class ConvRepresentation1d(eqx.Module):
     stride: int = 1
     lhs_dil: int = 1
     rhs_dil: int = 1
-    flip: bool = False
+    flip_kernel: bool = False
     permute_input: bool = False
     permute_kernel: bool = False
 
 class ConvRepresentation1dSimple(eqx.Module):
     pad: tuple[int, int] = (0, 0)
-    flip: bool = False
+    flip_kernel: bool = False
     permute_input: bool = False
     permute_kernel: bool = False
 
@@ -42,7 +42,7 @@ class ConvRepresentation1dSimple(eqx.Module):
         representation: ConvRepresentation1d,
     ):
         self.pad = representation.pad
-        self.flip = representation.flip
+        self.flip_kernel = representation.flip_kernel
         self.permute_input = representation.permute_input
         self.permute_kernel = representation.permute_kernel
 
@@ -138,7 +138,7 @@ def parse_conv_jaxpr(jaxpr: jax.core.Jaxpr) -> ConvRepresentation1d:
         stride=args_parsed["stride"],
         lhs_dil=args_parsed["lhs_dilation"],
         rhs_dil=args_parsed["rhs_dilation"],
-        flip=flip,
+        flip_kernel=flip,
         permute_input=permute_input,
         permute_kernel=permute_kernel,
     )
