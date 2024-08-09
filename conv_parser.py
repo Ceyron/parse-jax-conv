@@ -162,10 +162,12 @@ class ConvParser1d:
         return jax.make_jaxpr(self.get_conv_fun())(self._get_input_array(), self._get_kernel_array())
     
     def _get_input_vjp_fun(self):
-        return jax.vjp(self._get_conv_fun_input(), self._get_input_array())[1]
+        vjp_fun = jax.vjp(self._get_conv_fun_input(), self._get_input_array())[1]
+        return lambda cotangent: vjp_fun(cotangent)[0]
     
     def _get_kernel_vjp_fun(self):
-        return jax.vjp(self._get_conv_fun_kernel(), self._get_kernel_array())[1]
+        vjp_fun = jax.vjp(self._get_conv_fun_kernel(), self._get_kernel_array())[1]
+        return lambda cotangent: vjp_fun(cotangent)[0]
     
     def _get_output_array(self):
         out_shape = self.get_conv_fun()(self._get_input_array(), self._get_kernel_array()).shape
@@ -185,3 +187,18 @@ class ConvParser1d:
     
     def get_kernel_vjp_representation(self) -> ConvRepresentation1d:
         return parse_conv_jaxpr(self._get_kernel_vjp_fun_jaxpr())
+    
+    def _get_delta_N(self, fun, input):
+        input_N = input.shape[-1]
+        output = fun(input)
+        output_N = output.shape[-1]
+        return output_N - input_N
+    
+    def get_primal_delta_N(self):
+        return self._get_delta_N(self._get_conv_fun_input(), self._get_input_array())
+    
+    def get_input_vjp_delta_N(self):
+        return self._get_delta_N(self._get_input_vjp_fun(), self._get_output_array())
+    
+    def get_kernel_vjp_delta_N(self):
+        return self._get_delta_N(self._get_kernel_vjp_fun(), self._get_output_array())

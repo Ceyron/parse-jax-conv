@@ -33,13 +33,19 @@ with cols[0]:
     st.title("Primal")
     st.latex(r"z = w \star x = \text{conv}(x, w)")
     st.code(parser.get_primal_representation())
+    delta_N = parser.get_primal_delta_N()
+    st.latex(f"\Delta N = {delta_N}")
 
 with cols[1]:
     st.title("Input vJp")
     st.latex(r"\bar{x} = \text{conv}(\bar{z}, w)")
     st.code(parser.get_input_vjp_representation())
+    delta_N = parser.get_input_vjp_delta_N()
+    st.latex(f"\Delta N = {delta_N}")
 
 with cols[2]:
     st.title("Kernel vJp")
     st.latex(r"\bar{w} = \text{conv}(x, \bar{z})")
     st.code(parser.get_kernel_vjp_representation())
+    delta_N = parser.get_kernel_vjp_delta_N()
+    st.latex(f"\Delta N = {delta_N}")
