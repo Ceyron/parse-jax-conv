@@ -19,12 +19,15 @@ with st.sidebar:
         lhs_dilation = 1
         rhs_dilation = 1
 
+NUM_POINTS = 100
+
 parser = ConvParser1d(
     kernel_size=kernel_size,
     stride=stride,
     padding=(left_padding, right_padding),
     lhs_dilation=lhs_dilation,
     rhs_dilation=rhs_dilation,
+    array_size=NUM_POINTS,
 )
 
 cols = st.columns(3)
@@ -49,3 +52,6 @@ with cols[2]:
     st.code(parser.get_kernel_vjp_representation())
     delta_N = parser.get_kernel_vjp_delta_N()
     st.latex(f"\Delta N = {delta_N}")
+
+st.markdown("---")
+st.markdown(f"Number of points $N={NUM_POINTS}$")
