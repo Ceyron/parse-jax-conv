@@ -104,6 +104,8 @@ If we do the following in the primal, this affects the respective vJps as:
     - input vJp: rhs dilation
     - kernel vjp: stride
 
-(Note that there are potential adjustments to the padding.)
+lhs dilation has no effect on both vjp padding. 
+So does rhs dilation.
+Only strides in the primal execution affect the padding in the vjps.
 """
     )
