@@ -146,7 +146,7 @@ class ConvParser1d:
             return jax.lax.conv_general_dilated(
                 lhs, rhs,
                 window_strides=(self.stride,),
-                padding=self.padding,
+                padding=(self.padding,),
                 lhs_dilation=(self.lhs_dilation,),
                 rhs_dilation=(self.rhs_dilation,),
             )
