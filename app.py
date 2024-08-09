@@ -56,11 +56,12 @@ with cols[2]:
 
 st.markdown("---")
 st.markdown(f"Number of points $N={NUM_POINTS}$")
+st.markdown("IMPORTANT: despite saying it is 'convolution', this is actually cross-correlation!")
 
 with st.expander("Insights"):
     st.markdown(
-"""
-# Simplified options
+r"""
+## Simplified options
 
 Means:
 
@@ -76,10 +77,34 @@ Hence,
 
 $$ \Delta N = N_o - N_i = 1 - K $$
 
-The filter vJp has to compensate by adding $\Delta N$ per side in padding and
-flips the filter.
+The filter vJp has to compensate by adding $\Delta N$ per side in padding.
+Additionally, it flips the filter (reverse the spatial axis) and permutes $C_i$
+and $C_o$ axis of the filter.
 
-The kernel vJp has to permute the original input $x$ (swap batch and in channel
-axis).
+The kernel vJp has to permute the original input $x$ (swap batch $B$ and in
+channel $C_i$ axis) and has to permute the cotangent output $\bar{z}$ which acts
+as the kernel.
+
+## Advanced options
+
+### Influence of Padding
+
+TODO
+
+### Incluence of Stride, Left-Hand Side Dilation and Right-Hand Side Dilation
+
+If we do the following in the primal, this affects the respective vJps as:
+
+- primal: stride
+    - input vJp: lhs dilation
+    - kernel vjp: rhs dilation
+- primal: lhs dilation  ("transposed convolution")
+    - input vJp: stride
+    - kernel vjp: lhs dilation
+- primal: rhs dilation  ("dilated convolution")
+    - input vJp: rhs dilation
+    - kernel vjp: stride
+
+(Note that there are potential adjustments to the padding.)
 """
     )
